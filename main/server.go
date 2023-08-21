@@ -22,6 +22,10 @@ func main() {
 	http.HandleFunc("/", homeHandler)
 	// Handler for the "/ascii-art" URL
 	http.HandleFunc("/ascii-art", asciiArtHandler)
+	//Handle not found: 404
+	//Handle Bad request: 400
+	http.HandleFunc("/400.html", BadRequestHandler)
+	//Handle Server erorr: 500
 	log.Fatal(http.ListenAndServe(":8081", nil))
 }
 
@@ -36,12 +40,13 @@ func homeHandler(w http.ResponseWriter, r *http.Request) {
 // asciiArtHandler handles POST requests to the "/ascii-art" URL.
 // It generates ASCII art based on the input text and selected banner,
 // and renders the indexF.html template with the generated ASCII art.
-
+var text string
 func asciiArtHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method == http.MethodPost {
-		text := r.FormValue("text")
+		text = r.FormValue("text")
 		banner := r.FormValue("banner")
 		asciiArt := generateAsciiArt(text, banner)
+		
 		templates.ExecuteTemplate(w, "indexF.html", struct {
 			Text     string
 			Banner   string
@@ -54,6 +59,14 @@ func asciiArtHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+func BadRequestHandler(w http.ResponseWriter, r *http.Request) {
+	for _, ch := range text{
+		if ch > 127 && ch < 32 {
+		templates.ExecuteTemplate(w, "400.html", nil)
+	}
+	}
+}
+
 func generateAsciiArt(text, banner string) string {
 	// Implement your ASCII art generation logic based on the selected banner
 	// Here's a simple example for the three banners mentioned
@@ -63,6 +76,7 @@ func generateAsciiArt(text, banner string) string {
 		os.Exit(0)
 	}
 	defer file.Close()
+	
 	return 	asciiart.ReadLine(text, file)
 
 }
