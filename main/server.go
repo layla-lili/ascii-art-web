@@ -43,13 +43,16 @@ func main() {
 // It renders the index.html template.
 func homeHandler(w http.ResponseWriter, r *http.Request) {
 	if r.URL.Path != "/" {
-		templates.ExecuteTemplate(w, "404.html", nil)
-		return
+		err := templates.ExecuteTemplate(w, "404.html", nil)
+		if err != nil {
+			internalServerErrorHandler(w,r)
+			return
+		}
 	}
 	if r.Method == http.MethodGet {
 		err := templates.ExecuteTemplate(w, "index.html", nil)
 		if err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
+			internalServerErrorHandler(w,r)
 			return
 		}
 	}
@@ -72,7 +75,7 @@ func asciiArtHandler(w http.ResponseWriter, r *http.Request) {
 		if notENg {
 			err := templates.ExecuteTemplate(w, "400.html", nil)
 			if err != nil {
-				http.Error(w, err.Error(), http.StatusInternalServerError)
+				internalServerErrorHandler(w,r)
 				return
 			}
 			return
@@ -87,7 +90,7 @@ func asciiArtHandler(w http.ResponseWriter, r *http.Request) {
 				AsciiArt: asciiArt,
 			})
 			if err != nil {
-				http.Error(w, err.Error(), http.StatusInternalServerError)
+				internalServerErrorHandler(w,r)
 				return
 			}
 		}
