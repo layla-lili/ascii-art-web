@@ -1,1 +1,0 @@
-https://freefrontend.com/500-error-page-html-templates/
