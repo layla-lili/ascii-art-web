@@ -1,5 +1,4 @@
 package main
-
 import (
 	"asciiart"
 	"fmt"
@@ -8,9 +7,11 @@ import (
 	"net/http"
 	"os"
 )
-
 var templates *template.Template
 var text string
+type PageData struct {
+	TextColor string
+}
 
 func init() {
 	// Load templates
@@ -21,7 +22,6 @@ func init() {
 		"templates/500.html",
 	))
 }
-
 func main() {
 	fs := http.FileServer(http.Dir("static"))
 	http.Handle("/static/", http.StripPrefix("/static/", fs))
@@ -29,7 +29,6 @@ func main() {
 	http.HandleFunc("/", homeHandler)
 	// Handler for the "/ascii-art" URL
 	http.HandleFunc("/ascii-art", asciiArtHandler)
-
 	// Handle not found: 404
 	http.HandleFunc("/404", NotFoundHandler)
 	// Handle Bad Request : 400
@@ -38,7 +37,6 @@ func main() {
 	http.HandleFunc("/500", internalServerErrorHandler)
 	log.Fatal(http.ListenAndServe(":8081", nil))
 }
-
 // homeHandler handles GET requests to the root URL ("/").
 // It renders the index.html template.
 func homeHandler(w http.ResponseWriter, r *http.Request) {
@@ -57,7 +55,6 @@ func homeHandler(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 }
-
 // asciiArtHandler handles POST requests to the "/ascii-art" URL.
 // It generates ASCII art based on the input text and selected banner,
 // and renders the index.html template with the generated ASCII art.
@@ -95,25 +92,19 @@ func asciiArtHandler(w http.ResponseWriter, r *http.Request) {
 			}
 		}
 	}
-
 }
-
 func BadRequestHandler(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusBadRequest)
 	templates.ExecuteTemplate(w, "400.html", nil)
-
 }
-
 func NotFoundHandler(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusNotFound)
 	templates.ExecuteTemplate(w, "404.html", nil)
 }
-
 func internalServerErrorHandler(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusInternalServerError)
 	templates.ExecuteTemplate(w, "500.html", nil)
 }
-
 func generateAsciiArt(text, banner string) string {
 	// Implement your ASCII art generation logic based on the selected banner
 	// Here's a simple example for the three banners mentioned
@@ -123,6 +114,21 @@ func generateAsciiArt(text, banner string) string {
 		os.Exit(1)
 	}
 	defer file.Close()
-
 	return asciiart.ReadLine(text, file)
+}
+
+func handleUpdate(w http.ResponseWriter, r *http.Request) {
+	if r.Method == http.MethodPost {
+		textColor := r.FormValue("text-color")
+
+		data := PageData{TextColor: textColor}
+
+		tmpl := template.Must(template.ParseFiles("index.html"))
+		err := tmpl.Execute(w, data)
+		if err != nil {
+			log.Println(err)
+		}
+	} else {
+		http.Redirect(w, r, "/", http.StatusSeeOther)
+	}
 }
