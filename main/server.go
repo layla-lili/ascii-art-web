@@ -9,9 +9,6 @@ import (
 )
 var templates *template.Template
 var text string
-type PageData struct {
-	TextColor string
-}
 
 func init() {
 	// Load templates
@@ -115,20 +112,4 @@ func generateAsciiArt(text, banner string) string {
 	}
 	defer file.Close()
 	return asciiart.ReadLine(text, file)
-}
-
-func handleUpdate(w http.ResponseWriter, r *http.Request) {
-	if r.Method == http.MethodPost {
-		textColor := r.FormValue("text-color")
-
-		data := PageData{TextColor: textColor}
-
-		tmpl := template.Must(template.ParseFiles("index.html"))
-		err := tmpl.Execute(w, data)
-		if err != nil {
-			log.Println(err)
-		}
-	} else {
-		http.Redirect(w, r, "/", http.StatusSeeOther)
-	}
 }
