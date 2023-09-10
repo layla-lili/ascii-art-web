@@ -12,7 +12,7 @@
         <div class="form">
             <form class="ascii-form" method="POST" action="/ascii-art">
                 <!-- <input type="text" name="text" id="text" placeholder="Write your text here" value="{{ .Text }}" required ><br> -->
-                <textarea name="text" id="text" placeholder="Write your text here" required>{{ .Text }}</textarea><br>
+                <textarea name="text" id="text" placeholder="Write your text here" maxlength="100" required>{{ .Text }}</textarea><br>
                 <select name="banner" id="banner">
                     <option value="standard"{{ if eq .Banner "standard" }} selected{{ end }}>Standard</option>
                     <option value="shadow"{{ if eq .Banner "shadow" }} selected{{ end }}>Shadow</option>
