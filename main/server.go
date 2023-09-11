@@ -96,7 +96,7 @@ func asciiArtHandler(w http.ResponseWriter, r *http.Request) {
 }
 func BadRequestHandler(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusBadRequest)
-	err := templates.ExecuteTemplate(w, "4001.html", nil)
+	err := templates.ExecuteTemplate(w, "400.html", nil)
 	if err != nil {
 		internalServerErrorHandler(w, r)
 		return
